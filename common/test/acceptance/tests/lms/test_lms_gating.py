@@ -176,6 +176,8 @@ class GatingTest(UniqueCourseTest):
         Displayed along with notification banners
         Then if I masquerade as a student
         Then I cannot see a gated subsection
+        TODO: (1) i CAN see the gated subsection
+        TODO: (2) it should have a lock and (PREREQ REQUIRED)
         When I fufill the gating prerequisite
         Then I can see the gated subsection (without a banner)
         """
@@ -204,7 +206,7 @@ class GatingTest(UniqueCourseTest):
 
         self.course_home_page.visit()
         self.course_home_page.preview.set_staff_view_mode('Learner')
-        self.assertEqual(self.course_home_page.outline.num_subsections, 1)
+        self.assertEqual(self.course_home_page.outline.num_subsections, 2)
         self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1')
         self.courseware_page.wait_for_page()
         self.assertFalse(self.courseware_page.has_banner())
