@@ -151,8 +151,10 @@ class GatingTest(UniqueCourseTest):
         Given that I am a student
         When I visit the LMS Courseware
         Then I cannot see a gated subsection
+        TODO: then i CAN see a gated section, with lock and prereq note
         When I fulfill the gating Prerequisite
         Then I can see the gated subsection
+        TODO: and that the gated subsection has an unlock
         """
         self._setup_prereq()
         self._setup_gated_subsection()
@@ -160,7 +162,7 @@ class GatingTest(UniqueCourseTest):
         self._auto_auth(self.STUDENT_USERNAME, self.STUDENT_EMAIL, False)
 
         self.course_home_page.visit()
-        self.assertEqual(self.course_home_page.outline.num_subsections, 1)
+        self.assertEqual(self.course_home_page.outline.num_subsections, 2)
 
         # Fulfill prerequisite and verify that gated subsection is shown
         self.courseware_page.visit()
