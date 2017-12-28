@@ -170,13 +170,6 @@ class CourseOutlinePage(PageObject):
             raise ValueError("Could not find section '{0}'".format(section_title))
 
         try:
-            #TODO: is this change needed anymore?
-            # subsection_titles = self._subsection_titles(section_index + 1)
-            # subsection_index = [i for i in range(len(subsection_titles)) if subsection_title in subsection_titles[i]]
-            # if not subsection_index:
-            #     raise ValueError()
-
-            # subsection_index = subsection_index[0]
             subsection_index = self._subsection_titles(section_index + 1).index(subsection_title)
         except ValueError:
             raise ValueError("Could not find subsection '{0}' in section '{1}'".format(
