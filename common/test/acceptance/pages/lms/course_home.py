@@ -4,15 +4,12 @@ LMS Course Home page object
 
 from collections import OrderedDict
 
-import logging
 from bok_choy.page_object import PageObject
 
 from .bookmarks import BookmarksPage
 from .course_page import CoursePage
 from .courseware import CoursewarePage
 from .staff_view import StaffPreviewPage
-
-log = logging.getLogger(__name__)
 
 class CourseHomePage(CoursePage):
     """
@@ -173,12 +170,14 @@ class CourseOutlinePage(PageObject):
             raise ValueError("Could not find section '{0}'".format(section_title))
 
         try:
-            subsection_titles = self._subsection_titles(section_index + 1)
-            subsection_index = [i for i in range(len(subsection_titles)) if subsection_title in subsection_titles[i]]
-            if not subsection_index:
-                raise ValueError()
+            #TODO: is this change needed anymore?
+            # subsection_titles = self._subsection_titles(section_index + 1)
+            # subsection_index = [i for i in range(len(subsection_titles)) if subsection_title in subsection_titles[i]]
+            # if not subsection_index:
+            #     raise ValueError()
 
-            subsection_index = subsection_index[0]
+            # subsection_index = subsection_index[0]
+            subsection_index = self._subsection_titles(section_index + 1).index(subsection_title)
         except ValueError:
             raise ValueError("Could not find subsection '{0}' in section '{1}'".format(
                 subsection_title, section_title
