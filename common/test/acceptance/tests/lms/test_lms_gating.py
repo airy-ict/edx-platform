@@ -150,11 +150,13 @@ class GatingTest(UniqueCourseTest):
         """
         Given that I am a student
         When I visit the LMS Courseware
-        Then I cannot see a gated subsection
-        TODO: then i CAN see a gated section, with lock and prereq note
+        Then I can see a gated subsection
+TODO:            The gated subsection should have a lock icon
+TODO:            and be in the format: "<Subsection Title> (Prerequisite Required)"
         When I fulfill the gating Prerequisite
         Then I can see the gated subsection
-        TODO: and that the gated subsection has an unlock
+TODO:            Now the gated subsection should have an unlock icon
+TODO:            and screen readers should read the section as: "<Subsection Title> Unlocked"
         """
         self._setup_prereq()
         self._setup_gated_subsection()
@@ -177,9 +179,9 @@ class GatingTest(UniqueCourseTest):
         Then I can see all gated subsections
         Displayed along with notification banners
         Then if I masquerade as a student
-        Then I cannot see a gated subsection
-        TODO: (1) i CAN see the gated subsection
-        TODO: (2) it should have a lock and (PREREQ REQUIRED)
+        Then I can see a gated subsection
+TODO:            The gated subsection should have a lock icon
+TODO:            and be in the format: "<Subsection Title> (Prerequisite Required)"
         When I fufill the gating prerequisite
         Then I can see the gated subsection (without a banner)
         """

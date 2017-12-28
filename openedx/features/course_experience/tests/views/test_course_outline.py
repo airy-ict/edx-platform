@@ -21,7 +21,6 @@ from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesA
 
 from .test_course_home import course_home_url
 
-
 TEST_PASSWORD = 'test'
 GATING_NAMESPACE_QUALIFIER = '.gating'
 

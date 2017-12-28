@@ -5,8 +5,7 @@ from bok_choy.page_object import PageObject
 from selenium.webdriver.common.keys import Keys
 
 from common.test.acceptance.pages.common.utils import click_css
-import logging
-log = logging.getLogger(__name__)
+
 
 class ProblemPage(PageObject):
     """
@@ -24,7 +23,6 @@ class ProblemPage(PageObject):
         """
         Return the current problem name.
         """
-
         self.wait_for_element_visibility(self.CSS_PROBLEM_HEADER, 'wait for problem header')
         return self.q(css='.problem-header').text[0]
 

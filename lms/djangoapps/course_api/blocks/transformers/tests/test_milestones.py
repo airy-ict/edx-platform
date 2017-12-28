@@ -148,7 +148,10 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
     @ddt.unpack
     def test_gated(self, gated_block_ref, gating_block_ref, expected_blocks_before_completion):
         """
-        First, checks that a student cannot see the gated block when it is gated by the gating block and no
+        Students should be able to see gated content blocks before and after they have completed the 
+        prerequisite for it.
+
+        First, checks that a student can see the gated block when it is gated by the gating block and no
         attempt has been made to complete the gating block.
         Then, checks that the student can see the gated block after the gating block has been completed.
 

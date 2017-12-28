@@ -9,7 +9,6 @@ from web_fragments.fragment import Fragment
 from courseware.courses import get_course_overview_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
-from lms.djangoapps.course_api.blocks.api import get_blocks
 from ..utils import get_course_outline_block_tree
 from util.milestones_helpers import get_course_content_milestones
 from xmodule.modulestore.django import modulestore
@@ -26,8 +25,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         course_overview = get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-        course_block_tree = get_course_outline_block_tree(request, course_id)
 
+        course_block_tree = get_course_outline_block_tree(request, course_id)
         if not course_block_tree:
             return None
 

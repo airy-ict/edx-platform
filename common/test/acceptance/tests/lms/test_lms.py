@@ -42,9 +42,6 @@ from common.test.acceptance.tests.helpers import (
     select_option_by_text,
 )
 
-import logging
-log = logging.getLogger(__name__)
-
 
 @attr(shard=8)
 class ForgotPasswordPageTest(UniqueCourseTest):
@@ -1007,10 +1004,6 @@ class ProblemExecutionTest(UniqueCourseTest):
         # Navigate to the problem page
         self.course_home_page.visit()
         self.course_home_page.outline.go_to_section('Test Section', 'Test Subsection')
-
-        log.info(">>> self.browser: '{0}'".format(
-            self.browser
-        ))
 
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_name.upper(), 'PYTHON PROBLEM')

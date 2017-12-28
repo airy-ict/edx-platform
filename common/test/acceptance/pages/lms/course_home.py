@@ -11,6 +11,7 @@ from .course_page import CoursePage
 from .courseware import CoursewarePage
 from .staff_view import StaffPreviewPage
 
+
 class CourseHomePage(CoursePage):
     """
     Course home page, including course outline.
@@ -164,7 +165,6 @@ class CourseOutlinePage(PageObject):
         Example:
             go_to_section("Week 1", "Lesson 1")
         """
-
         section_index = self._section_title_to_index(section_title)
         if section_index is None:
             raise ValueError("Could not find section '{0}'".format(section_title))
