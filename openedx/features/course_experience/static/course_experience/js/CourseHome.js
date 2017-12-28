@@ -128,7 +128,7 @@ export class CourseHome {  // eslint-disable-line import/prefer-default-export
   // Promotion analytics for upgrade messages on course home.
   // eslint-disable-next-line class-methods-use-this
   configureUpgradeAnalytics() {
-    $('.section-upgrade .btn-upgrade').each(
+    $('.btn-upgrade').each(
       (index, button) => {
         const promotionEventProperties = {
           promotion_id: 'courseware_verified_certificate_upsell',
@@ -151,6 +151,10 @@ export class CourseHome {  // eslint-disable-line import/prefer-default-export
     $('.section-upgrade .btn-upgrade').click(() => {
       Logger.log('edx.bi.course.upgrade.sidebarupsell.clicked', logEventProperties);
       Logger.log('edx.course.enrollment.upgrade.clicked', { location: 'sidebar-message' });
+    });
+    $('.promo-learn-more').click(() => {
+      $('.action-toggle-verification-sock').click();
+      $('.action-toggle-verification-sock')[0].scrollIntoView({behavior: 'smooth', alignToTop: true});
     });
   }
 }
