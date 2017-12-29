@@ -25,16 +25,16 @@
     cursor:pointer
   }
 
+  .hidden {
+    display: none !important;
+  }
+
   .show-video-transcripts-wrapper {
     display: block;
 
     .button-link {
       color: $ui-link-color !important;
     }
-  }
-
-  .show-video-transcripts-wrapper.hidden {
-    display: none;
   }
 
   .show-video-transcript-content {

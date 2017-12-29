@@ -8,7 +8,8 @@ define(
             tagName: 'div',
 
             events: {
-                'click .toggle-show-transcripts-button': 'toggleShowTranscripts'
+                'click .toggle-show-transcripts-button': 'toggleShowTranscripts',
+                'click .upload-transcript-button': 'chooseFile'
             },
 
             initialize: function(options) {
@@ -19,6 +20,12 @@ define(
                 this.videoSupportedFileFormats = options.videoSupportedFileFormats;
                 this.videoTranscriptSettings = options.videoTranscriptSettings;
                 this.template = HtmlUtils.template(videoTranscriptsTemplate);
+
+                // This is needed to attach transcript methods to this object while uploading.
+                _.bindAll(
+                    this, 'render', 'chooseFile', 'transcriptSelected', 'transcriptUploadSucceeded',
+                    'transcriptUploadFailed'
+                );
             },
 
             /*
@@ -71,6 +78,86 @@ define(
                     this.$el.find('.toggle-show-transcripts-icon').removeClass('fa-caret-down').addClass('fa-caret-right'); // eslint-disable-line max-len
                 } else {
                     this.$el.find('.toggle-show-transcripts-icon').removeClass('fa-caret-right').addClass('fa-caret-down'); // eslint-disable-line max-len
+                }
+            },
+
+            validateTranscriptFile: function(transcriptFile) {
+                var errorMessage = '';
+                // TODO: Validations if any ?
+                return errorMessage;
+            },
+
+            chooseFile: function(event) {
+                var $transcriptContainer = $(event.target).parents('.show-video-transcript-content'),
+                    $transcriptUploadEl = $transcriptContainer.find('.upload-transcript-input');
+
+                $transcriptUploadEl.fileupload({
+                    url: this.videoTranscriptSettings.transcript_upload_handler_url,
+                    add: this.transcriptSelected,
+                    done: this.transcriptUploadSucceeded,
+                    fail: this.transcriptUploadFailed,
+                    formData: {
+                        edx_video_id: this.edxVideoID,
+                        language_code: $transcriptContainer.data('language-code'),
+                        new_language_code: $transcriptContainer.find('.transcript-language-menu').val(),
+                        gloabl: false   // Do not trigger global AJAX error handler
+                    }
+                });
+
+                $transcriptUploadEl.click();
+            },
+
+            transcriptSelected: function(event, data) {
+                var errorMessage;
+
+                // If an error is already present above the video transcript element, remove it.
+                this.clearErrorMessage('');
+
+                errorMessage = ''; // this.validateTranscriptFile(data.files[0]);
+                if (!errorMessage) {
+                    // Do not trigger global AJAX error handler
+                    // data.global = false;    // eslint-disable-line no-param-reassign
+                    // data.edx_video_id = 'edx-video-id';
+                    // data.language_code = 'edx-video-id';
+                    // data.formData = {edx_video_id: 'edx-video-id', language_code: 'en'};
+                    this.readMessages([gettext('Video transcript upload started')]);
+                    data.submit();
+                } else {
+                    this.showErrorMessage(errorMessage);
+                }
+            },
+
+            transcriptUploadSucceeded: function(event, data) {
+                // TODO: Update anu UI?
+                //this.$('img').attr('src', data.result.image_url);
+                this.readMessages([gettext('Video transcript upload completed')]);
+            },
+
+            transcriptUploadFailed: function(event, data) {
+                var errorText = JSON.parse(data.jqXHR.responseText).error;
+                this.showErrorMessage(errorText);
+            },
+
+            clearErrorMessage: function(transcriptLanguageCode) {
+                // TODO: Clear error message.
+                /*
+                var $thumbnailWrapperEl = $('.thumbnail-error-wrapper[data-video-id="' + videoId + '"]');
+                if ($thumbnailWrapperEl.length) {
+                    $thumbnailWrapperEl.remove();
+                }
+                // Remove error class from thumbnail wrapper as well.
+                $('.thumbnail-wrapper').removeClass('error');
+                */
+            },
+
+            showErrorMessage: function(errorMessage) {
+                // TODO: Show error message UI
+                console.log(errorMessage);
+            },
+
+            readMessages: function(messages) {
+                if ($(window).prop('SR') !== undefined) {
+                    $(window).prop('SR').readTexts(messages);
                 }
             },
 

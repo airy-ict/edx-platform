@@ -41,8 +41,6 @@ define(
                 );
 
                 expect(uploadTranscriptActionEl.html().trim(), 'Upload');
-                expect(uploadTranscriptActionEl.data('edx-video-id'), edxVideoID);
-                expect(uploadTranscriptActionEl.data('language-code'), transcriptLanguage);
             };
 
             renderView = function(availableTranscripts, isVideoTranscriptEnabled) {
@@ -177,7 +175,7 @@ define(
                 );
 
                 _.each(transcripts, function(langaugeText, languageCode) {
-                    $transcriptEl = $(videoTranscriptsView.$el.find('#show-video-transcript-content-' + languageCode));
+                    $transcriptEl = videoTranscriptsView.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
                     // Verify correct transcript title is set.
                     expect($transcriptEl.find('.transcript-title').html()).toEqual(
                         'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
