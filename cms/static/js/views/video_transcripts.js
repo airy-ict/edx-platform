@@ -1,7 +1,8 @@
 define(
     ['underscore', 'gettext', 'js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils',
-        'edx-ui-toolkit/js/utils/string-utils', 'text!templates/video-transcripts.underscore'],
-    function(_, gettext, BaseView, HtmlUtils, StringUtils, videoTranscriptsTemplate) {
+        'edx-ui-toolkit/js/utils/string-utils', 'text!templates/video-transcripts.underscore',
+        'text!templates/video-transcript-response.underscore'],
+    function(_, gettext, BaseView, HtmlUtils, StringUtils, videoTranscriptsTemplate, videoTranscriptResponseTemplate) {
         'use strict';
 
         var VideoTranscriptsView = BaseView.extend({
@@ -20,6 +21,7 @@ define(
                 this.videoSupportedFileFormats = options.videoSupportedFileFormats;
                 this.videoTranscriptSettings = options.videoTranscriptSettings;
                 this.template = HtmlUtils.template(videoTranscriptsTemplate);
+                this.transcriptResponseTemplate = HtmlUtils.template(videoTranscriptResponseTemplate);
 
                 // This is needed to attach transcript methods to this object while uploading.
                 _.bindAll(
@@ -108,22 +110,15 @@ define(
             },
 
             transcriptSelected: function(event, data) {
-                var errorMessage;
-
-                // If an error is already present above the video transcript element, remove it.
-                this.clearErrorMessage('');
+                var errorMessage,
+                    $transcriptContainer = $(event.target).parents('.show-video-transcript-content');
 
                 errorMessage = ''; // this.validateTranscriptFile(data.files[0]);
                 if (!errorMessage) {
-                    // Do not trigger global AJAX error handler
-                    // data.global = false;    // eslint-disable-line no-param-reassign
-                    // data.edx_video_id = 'edx-video-id';
-                    // data.language_code = 'edx-video-id';
-                    // data.formData = {edx_video_id: 'edx-video-id', language_code: 'en'};
-                    this.readMessages([gettext('Video transcript upload started')]);
                     data.submit();
+                    this.renderMessage($transcriptContainer, 'uploading');
                 } else {
-                    this.showErrorMessage(errorMessage);
+                    this.renderMessage($transcriptContainer, 'failed', errorMessage);
                 }
             },
 
@@ -144,30 +139,68 @@ define(
                     )
                 );
 
-
-                this.readMessages([gettext('Video transcript upload completed')]);
+                this.renderMessage($transcriptContainer, 'uploaded');
             },
 
             transcriptUploadFailed: function(event, data) {
-                var errorText = JSON.parse(data.jqXHR.responseText).error;
-                this.showErrorMessage(errorText);
+                var languageCode = data.formData.language_code,
+                    $transcriptContainer = this.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]'),  // eslint-disable-line max-len
+                    errorMessage = JSON.parse(data.jqXHR.responseText).error;
+
+                // Reset transcript language back to original.
+                $transcriptContainer.find('.transcript-language-menu').val(languageCode);
+
+                this.renderMessage($transcriptContainer, 'failed', errorMessage);
             },
 
-            clearErrorMessage: function(transcriptLanguageCode) {
-                // TODO: Clear error message.
-                /*
-                var $thumbnailWrapperEl = $('.thumbnail-error-wrapper[data-video-id="' + videoId + '"]');
-                if ($thumbnailWrapperEl.length) {
-                    $thumbnailWrapperEl.remove();
+            clearMessage: function($transcriptContainer) {
+                HtmlUtils.setHtml(
+                    $transcriptContainer.find('.transcript-response-message-container'),
+                    ''
+                );
+            },
+
+            renderMessage: function($transcriptContainer, status, errorMessage) {
+                var responseIconClasses,
+                    responseMessage,
+                    responseSRMessage,
+                    showErrorInfoIcon = 'hidden';
+
+                // If a messge is already present above the video transcript element, remove it.
+                this.clearMessage($transcriptContainer);
+
+                switch (status) {
+                case 'uploaded':
+                    responseIconClasses = 'fa-check';
+                    responseMessage = 'Transcript uploaded.';
+                    responseSRMessage = 'Video transcript upload completed';
+                    showErrorInfoIcon = 'hidden';
+                    break;
+                case 'failed':
+                    responseIconClasses = 'fa-exclamation-triangle';
+                    responseMessage = errorMessage || 'Transcript upload failed.';
+                    responseSRMessage = 'Video transcript upload failed';
+                    showErrorInfoIcon = '';
+                    break;
+                case 'uploading':
+                    responseIconClasses = 'fa-spinner fa-pulse';
+                    responseMessage = 'Uploading transcript';
+                    responseSRMessage = 'Video transcript upload started';
+                    showErrorInfoIcon = 'hidden';
+                    break;
+                default:
+                    break;
                 }
-                // Remove error class from thumbnail wrapper as well.
-                $('.thumbnail-wrapper').removeClass('error');
-                */
-            },
 
-            showErrorMessage: function(errorMessage) {
-                // TODO: Show error message UI
-                console.log(errorMessage);
+                HtmlUtils.setHtml(
+                    $transcriptContainer.find('.transcript-response-message-container'),
+                    this.transcriptResponseTemplate({
+                        responseIconClasses: responseIconClasses,
+                        responseMessage: gettext(responseMessage),
+                        showErrorInfoIcon: showErrorInfoIcon
+                    })
+                );
+                this.readMessages([gettext(responseSRMessage)]);
             },
 
             readMessages: function(messages) {

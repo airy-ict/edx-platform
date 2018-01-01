@@ -14,6 +14,7 @@
 <div class='show-video-transcripts-wrapper hidden'>
 <% _.each(transcripts, function(transcriptLanguageText, transcriptLanguageCode){ %>
     <div class='show-video-transcript-content' data-edx-video-id="<%- edxVideoID %>" data-language-code="<%- transcriptLanguageCode %>">
+        <div class='transcript-response-message-container'></div>
         <strong class='transcript-title'><%- StringUtils.interpolate(gettext('{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}'), {transcriptClientTitle: transcriptClientTitle, transcriptLanguageCode: transcriptLanguageCode, fileExtension: transcriptDownloadFileFormat}) %></strong>
         <select class='transcript-language-menu'>
             <option value=''>Select Language</option>
