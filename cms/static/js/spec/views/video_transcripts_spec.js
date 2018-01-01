@@ -1,12 +1,13 @@
 define(
     ['jquery', 'underscore', 'backbone', 'js/views/video_transcripts', 'js/views/previous_video_upload_list',
-        'common/js/spec_helpers/template_helpers'],
-    function($, _, Backbone, VideoTranscriptsView, PreviousVideoUploadListView, TemplateHelpers) {
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers'],
+    function($, _, Backbone, VideoTranscriptsView, PreviousVideoUploadListView, AjaxHelpers, TemplateHelpers) {
         'use strict';
         describe('VideoTranscriptsView', function() {
             var videoTranscriptsView,
                 renderView,
                 verifyTranscriptActions,
+                createFakeTranscriptFile,
                 transcripts = {
                     en: 'English',
                     es: 'Spanish',
@@ -23,10 +24,12 @@ define(
                 },
                 TRANSCRIPT_DOWNLOAD_FILE_FORMAT = 'srt',
                 TRANSCRIPT_DOWNLOAD_URL = 'abc.com/transcript_download/course_id',
+                TRANSCRIPT_UPLOAD_URL = 'abc.com/transcript_upload/course_id',
                 videoSupportedFileFormats = ['.mov', '.mp4'],
                 videoTranscriptSettings = {
                     trancript_download_file_format: TRANSCRIPT_DOWNLOAD_FILE_FORMAT,
-                    transcript_download_handler_url: TRANSCRIPT_DOWNLOAD_URL
+                    transcript_download_handler_url: TRANSCRIPT_DOWNLOAD_URL,
+                    transcript_upload_handler_url: TRANSCRIPT_UPLOAD_URL
                 },
                 videoListView;
 
@@ -41,6 +44,12 @@ define(
                 );
 
                 expect(uploadTranscriptActionEl.html().trim(), 'Upload');
+            };
+
+            createFakeTranscriptFile = function() {
+                var size = 100,
+                    type = 'application/srt';    // eslint-disable-line no-redeclare
+                return new Blob([Array(size + 1).join('i')], {type: type});
             };
 
             renderView = function(availableTranscripts, isVideoTranscriptEnabled) {
@@ -186,6 +195,42 @@ define(
                     // Verify transcript actions are rendered correctly.
                     verifyTranscriptActions($transcriptEl.find('.transcript-actions'), languageCode);
                 });
+            });
+
+            it('can upload transcript', function() {
+                var languageCode = 'en',
+                    newLanguageCode = 'ur',
+                    requests = AjaxHelpers.requests(this),
+                    $transcriptEl = videoTranscriptsView.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]');
+
+                    // Verify correct transcript title is set.
+                expect($transcriptEl.find('.transcript-title').html()).toEqual(
+                    'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
+                );
+
+                // Select a language
+                $transcriptEl.find('.transcript-language-menu').val(newLanguageCode);
+
+                $transcriptEl.find('.upload-transcript-button').click();
+
+                // Add transcript to upload queue and send POST request to upload transcript.
+                $transcriptEl.find('.upload-transcript-input').fileupload('add', {files: [createFakeTranscriptFile()]});
+
+                // Verify if POST request received for image upload
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'POST',
+                    TRANSCRIPT_UPLOAD_URL
+                );
+
+                // Send successful upload response
+                AjaxHelpers.respondWithJson(requests, {transcript_url: TRANSCRIPT_UPLOAD_URL});
+
+                // Verify correct transcript title is set.
+                expect($transcriptEl.find('.transcript-title').html()).toEqual(
+                    'Video client title n_' + newLanguageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
+                );
+
             });
         });
     }

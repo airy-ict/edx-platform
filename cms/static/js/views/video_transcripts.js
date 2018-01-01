@@ -47,7 +47,7 @@ define(
                 var clientTitle = this.clientVideoID;
                 // Remove video file extension for transcript title.
                 _.each(this.videoSupportedFileFormats, function(videoFormat) {
-                    clientTitle.replace(videoFormat, '');
+                    clientTitle = clientTitle.replace(videoFormat, '');
                 });
                 return clientTitle.substring(0, 20);
             },
@@ -128,8 +128,23 @@ define(
             },
 
             transcriptUploadSucceeded: function(event, data) {
-                // TODO: Update anu UI?
-                //this.$('img').attr('src', data.result.image_url);
+                var languageCode = data.formData.language_code,
+                    newLanguageCode = data.formData.new_language_code,
+                    $transcriptContainer = this.$el.find('.show-video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
+
+                $transcriptContainer.data('language-code', newLanguageCode);
+                HtmlUtils.setHtml(
+                    $transcriptContainer.find('.transcript-title'),
+                    StringUtils.interpolate(gettext('{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}'),
+                        {
+                            transcriptClientTitle: this.getTranscriptClientTitle(),
+                            transcriptLanguageCode: newLanguageCode,
+                            fileExtension: this.videoTranscriptSettings.trancript_download_file_format
+                        }
+                    )
+                );
+
+
                 this.readMessages([gettext('Video transcript upload completed')]);
             },
 
